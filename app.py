@@ -2,7 +2,7 @@
 # Imports
 #----------------------------------------------------------------------------#
 
-import json
+import json, pickle
 import dateutil.parser
 import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
@@ -12,6 +12,9 @@ import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
+from flask_migrate import Migrate
+
+
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -20,8 +23,10 @@ app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+context = app.app_context()
 
-# TODO: connect to a local postgresql database
+# COMPLETED: Add local database URI to config file
 
 #----------------------------------------------------------------------------#
 # Models.
@@ -31,7 +36,7 @@ class Venue(db.Model):
     __tablename__ = 'Venue'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
+    name = db.Column(db.String, nullable=False)
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
     address = db.Column(db.String(120))
@@ -39,23 +44,68 @@ class Venue(db.Model):
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
+    # newly implemented fields, including child relationship to Show
+    website_link = db.Column(db.String(120))
+    genres = db.Column(db.PickleType) 
+    seeking_talent = db.Column(db.Boolean, default=False)
+    seeking_description = db.Column(db.String(120))
+    shows = db.relationship('Show', backref="venue", lazy=True)
 
 class Artist(db.Model):
     __tablename__ = 'Artist'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
+    name = db.Column(db.String, nullable=False)
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
     phone = db.Column(db.String(120))
-    genres = db.Column(db.String(120))
+    genres = db.Column(db.PickleType)
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
+    # newly implemented fields, including child relationship to Show
+    # database best practice suggests using bit instead of Bool, but chose Bool 
+    # because it's in SQLAlchemy docs
+    website_link = db.Column(db.String(120))
+    seeking_venue = db.Column(db.Boolean, default=False)
+    shows = db.relationship('Show', backref="artist", lazy=True)
 
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
+class Show(db.Model):
+    __tablename__ = 'Show'
+
+    #may need to make id into tuple (artist_id, venue_id, start_time)
+    id = db.Column(db.Integer, primary_key=True) 
+    artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
+    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
+    start_time = db.Column(db.DateTime, nullable=False)
+
+
+#instantiate all models in local database
+with context:
+  #db.drop_all() #when testing use this
+  db.create_all()
+  #instantiate mock data through models
+  #use mock data to test before database migration
+  venue1 = Venue(name="The Musical Hop", genres= ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
+  address="1015 Folsom Street", city="San Francisco", state="CA", phone="123-123-1234",
+  website_link="https://www.themusicalhop.com", facebook_link="https://www.facebook.com/TheMusicalHop", seeking_talent=True, 
+  seeking_description="We are on the lookout for a local artist to play every two weeks. Please call us.", image_link="https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60")
+  venue2 = Venue(name="The Dueling Pianos Bar", genres= ["Classical", "R&B", "Hip-Hop"],
+  address="335 Delancey Street", city="New York", state="NY", phone="914-003-1132",
+  website_link="https://www.theduelingpianos.com", facebook_link="https://www.facebook.com/theduelingpianos", seeking_talent=False,
+  image_link="https://images.unsplash.com/photo-1497032205916-ac775f0649ae?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80")
+  venue3 = Venue(name="Park Square Live Music & Coffee", genres=["Rock n Roll", "Jazz", "Classical", "Folk"],
+  address="34 Whiskey Moore Ave", city="San Francisco", state="CA", phone="415-000-1234",
+  website_link="https://www.parksquarelivemusicandcoffee.com", facebook_link="https://www.facebook.com/ParkSquareLiveMusicAndCoffee", seeking_talent=False, 
+  image_link="https://images.unsplash.com/photo-1485686531765-ba63b07845a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=747&q=80")
+  artist1 = Artist(name="Guns N Petals", genres=["Rock n Roll"], city="San Francisco", state="CA", phone="326-123-5000", website_link="https://www.gunsnpetalsband.com",
+  facebook_link="https://www.facebook.com/GunsNPetals", seeking_venue=True, seeking_description="Looking for shows to perform at in the San Francisco Bay Area!",
+  image_link="https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80")
+  artist2 = Artist(name="Matt Quevedo", genres=["Jazz"], city="New York", state="NY", phone="300-400-5000",
+  facebook_link="https://www.facebook.com/mattquevedo923251523", seeking_venue=False, image_link="https://images.unsplash.com/photo-1495223153807-b916f75de8c5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80")
+  artist3 = Artist(name="The Wild Sax Band", genres=["Jazz", "Classical"], city="San Francisco", state="CA", phone="432-325-5432",
+  seeking_venue=False, image_link="https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80") 
+
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -347,6 +397,7 @@ def show_artist(artist_id):
   }
   data = list(filter(lambda d: d['id'] == artist_id, [data1, data2, data3]))[0]
   return render_template('pages/show_artist.html', artist=data)
+
 
 #  Update
 #  ----------------------------------------------------------------
