@@ -3,24 +3,23 @@ Fyyur
 
 ## Introduction
 
-Fyyur is a musical venue and artist booking site that facilitates the discovery and bookings of shows between local performing artists and venues. This site lets you list new artists and venues, discover them, and list shows with artists as a venue owner.
+Fyyur is a web application project created by Udacity for their Full-Stack Web Application Developer nanodegree. 
+It is a musical venue and artist booking site that facilitates the discovery and bookings of shows between local performing artists and venues. This site lets the user list new artists and venues, discover them, and list shows with artists as a venue owner.
 
-Your job is to build out the data models to power the API endpoints for the Fyyur site by connecting to a PostgreSQL database for storing, querying, and creating information about artists and venues on Fyyur.
+The task is to build out the data models to power the API endpoints for the Fyyur site by connecting to a PostgreSQL database for storing, querying, and creating information about artists and venues on Fyyur. The app starts with pre-implemented views populated with mock data in JSONs, and basic controller logic.
 
 ## Overview
 
-This app is nearly complete. It is only missing one thing… real data! While the views and controllers are defined in this application, it is missing models and model interactions to be able to store retrieve, and update data from a database. By the end of this project, you should have a fully functioning site that is at least capable of doing the following, if not more, using a PostgreSQL database:
+ By the end of this project, there should be a fully functioning site that is at least capable of doing the following, if not more, using a PostgreSQL database:
 
 * creating new venues, artists, and creating new shows.
 * searching for venues and artists.
 * learning more about a specific artist or venue.
 
-We want Fyyur to be the next new platform that artists and musical venues can use to find each other, and discover new music shows. Let's make that happen!
-
 ## Tech Stack (Dependencies)
 
 ### 1. Backend Dependencies
-Our tech stack will include the following:
+The tech stack includes the following:
  * **virtualenv** as a tool to create isolated Python environments
  * **SQLAlchemy ORM** to be our ORM library of choice
  * **PostgreSQL** as our database of choice
@@ -37,7 +36,7 @@ pip install Flask-Migrate
 > **Note** - If we do not mention the specific version of a package, then the default latest stable package will be installed. 
 
 ### 2. Frontend Dependencies
-You must have the **HTML**, **CSS**, and **Javascript** with [Bootstrap 3](https://getbootstrap.com/docs/3.4/customize/) for our website's frontend. Bootstrap can only be installed by Node Package Manager (NPM). Therefore, if not already, download and install the [Node.js](https://nodejs.org/en/download/). Windows users must run the executable as an Administrator, and restart the computer after installation. After successfully installing the Node, verify the installation as shown below.
+There must be **HTML**, **CSS**, and **Javascript** with [Bootstrap 3](https://getbootstrap.com/docs/3.4/customize/) for the website's frontend. Bootstrap can only be installed by Node Package Manager (NPM). Therefore, if not already, download and install the [Node.js](https://nodejs.org/en/download/). Windows users must run the executable as an Administrator, and restart the computer after installation. After successfully installing the Node, verify the installation as shown below.
 ```
 node -v
 npm -v
@@ -87,20 +86,6 @@ Highlight folders:
 * Models in `app.py` -- (Missing functionality.) Defines the data models that set up the database tables.
 * `config.py` -- (Missing functionality.) Stores configuration variables and instructions, separate from the main application code. This is where you will need to connect to the database.
 
-
-Instructions
------
-
-1. Understand the Project Structure (explained above) and where important files are located.
-2. Build and run local development following the Development Setup steps below.
-3. Fill in the missing functionality in this application: this application currently pulls in fake data, and needs to now connect to a real database and talk to a real backend.
-4. Fill out every `TODO` section throughout the codebase. We suggest going in order of the following:
-    * Connect to a database in `config.py`. A project submission that uses a local database connection is fine.
-    * Using SQLAlchemy, set up normalized models for the objects we support in our web app in the Models section of `app.py`. Check out the sample pages provided at /artists/1, /venues/1, and /shows for examples of the data we want to model, using all of the learned best practices in database schema design. Implement missing model properties and relationships using database migrations via Flask-Migrate.
-    * Implement form submissions for creating new Venues, Artists, and Shows. There should be proper constraints, powering the `/create` endpoints that serve the create form templates, to avoid duplicate or nonsensical form submissions. Submitting a form should create proper new records in the database.
-    * Implement the controllers for listing venues, artists, and shows. Note the structure of the mock data used. We want to keep the structure of the mock data.
-    * Implement search, powering the `/search` endpoints that serve the application's search functionalities.
-    * Serve venue and artist detail pages, powering the `<venue|artist>/<id>` endpoints that power the detail pages.
 
 #### Data Handling with `Flask-WTF` Forms
 The starter codes use an interactive form builder library called [Flask-WTF](https://flask-wtf.readthedocs.io/). This library provides useful functionality, such as form validation and error handling. You can peruse the Show, Venue, and Artist form builders in `forms.py` file. The WTForms are instantiated in the `app.py` file. For example, in the `create_shows()` function, the Show form is instantiated from the command: `form = ShowForm()`. To manage the request from Flask-WTF form, each field from the form has a `data` attribute containing the value from user input. For example, to handle the `venue_id` data from the Venue form, you can use: `show = Show(venue_id=form.venue_id.data)`, instead of using `request.form['venue_id']`.
