@@ -29,6 +29,7 @@ context = app.app_context()
 
 # COMPLETED: Add local database URI to config file
 
+
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
@@ -47,7 +48,7 @@ class Venue(db.Model):
 
     # newly implemented fields, including child relationship to Show
     website_link = db.Column(db.String(120))
-    genres = db.Column(db.PickleType) 
+    genres = db.Column(db.PickleType)
     seeking_talent = db.Column(db.Boolean, default=False)
     seeking_description = db.Column(db.String(120))
     shows = db.relationship('Show', backref="venue", lazy=True)
@@ -65,7 +66,7 @@ class Artist(db.Model):
     facebook_link = db.Column(db.String(120))
 
     # newly implemented fields, including child relationship to Show
-    # database best practice suggests using bit instead of Bool, but chose Bool 
+    # database best practice suggests using bit instead of Bool, but chose Bool
     # because it's in SQLAlchemy docs
     website_link = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean, default=False)
@@ -76,7 +77,7 @@ class Show(db.Model):
     __tablename__ = 'Show'
 
     #may need to make id into tuple (artist_id, venue_id, start_time)
-    id = db.Column(db.Integer, primary_key=True) 
+    id = db.Column(db.Integer, primary_key=True)
     artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
     venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
     start_time = db.Column(db.DateTime, nullable=False)
@@ -148,6 +149,7 @@ def index():
 def venues():
   # DONE: replace with real venues data.
   #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
+  #       later: see if can aggregate num of upcoming shows using .count() instead of iteration
   cities = set([(v.city, v.state) for v in Venue.query.all()])
   time = datetime.utcnow()
   #create dict of venue to num upcoming shows
@@ -180,84 +182,33 @@ def search_venues():
 def show_venue(venue_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
-  data1={
-    "id": 1,
-    "name": "The Musical Hop",
-    "genres": ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
-    "address": "1015 Folsom Street",
-    "city": "San Francisco",
-    "state": "CA",
-    "phone": "123-123-1234",
-    "website": "https://www.themusicalhop.com",
-    "facebook_link": "https://www.facebook.com/TheMusicalHop",
-    "seeking_talent": True,
-    "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",
-    "image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60",
-    "past_shows": [{
-      "artist_id": 4,
-      "artist_name": "Guns N Petals",
-      "artist_image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80",
-      "start_time": "2019-05-21T21:30:00.000Z"
-    }],
-    "upcoming_shows": [],
-    "past_shows_count": 1,
-    "upcoming_shows_count": 0,
+  # check if for joins what type of join
+  # later, see if can do it without list comprehension using group_by etc and avoid two Artist.query.gets
+  v = Venue.query.get(venue_id)
+  time = datetime.utcnow()
+  shows = Show.query.join(Venue).filter(Venue.id == venue_id).all()
+  upcoming_shows = [{"artist_id": s.artist_id, "artist_name": Artist.query.get(s.artist_id).name, "artist_image_link":
+  Artist.query.get(s.artist_id).image_link, "start_time": str(s.start_time)} for s in shows if s.start_time > time]
+  past_shows = [{"artist_id": s.artist_id, "artist_name": Artist.query.get(s.artist_id).name, "artist_image_link":
+    Artist.query.get(s.artist_id).image_link, "start_time": str(s.start_time)} for s in shows if s.start_time <= time]
+  data = {
+    "id": v.id,
+    "name": v.name,
+    "genres": v.genres,
+    "address": v.address,
+    "city": v.city,
+    "state": v.state,
+    "phone": v.phone,
+    "website": v.website_link,
+    "facebook_link": v.facebook_link,
+    "seeking_talent": v.seeking_talent,
+    "seeking_description": v.seeking_description,
+    "image_link": v.image_link,
+    "past_shows": past_shows,
+    "upcoming_shows": upcoming_shows,
+    "past_shows_count": len(past_shows),
+    "upcoming_shows_count": len(upcoming_shows)
   }
-  data2={
-    "id": 2,
-    "name": "The Dueling Pianos Bar",
-    "genres": ["Classical", "R&B", "Hip-Hop"],
-    "address": "335 Delancey Street",
-    "city": "New York",
-    "state": "NY",
-    "phone": "914-003-1132",
-    "website": "https://www.theduelingpianos.com",
-    "facebook_link": "https://www.facebook.com/theduelingpianos",
-    "seeking_talent": False,
-    "image_link": "https://images.unsplash.com/photo-1497032205916-ac775f0649ae?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80",
-    "past_shows": [],
-    "upcoming_shows": [],
-    "past_shows_count": 0,
-    "upcoming_shows_count": 0,
-  }
-  data3={
-    "id": 3,
-    "name": "Park Square Live Music & Coffee",
-    "genres": ["Rock n Roll", "Jazz", "Classical", "Folk"],
-    "address": "34 Whiskey Moore Ave",
-    "city": "San Francisco",
-    "state": "CA",
-    "phone": "415-000-1234",
-    "website": "https://www.parksquarelivemusicandcoffee.com",
-    "facebook_link": "https://www.facebook.com/ParkSquareLiveMusicAndCoffee",
-    "seeking_talent": False,
-    "image_link": "https://images.unsplash.com/photo-1485686531765-ba63b07845a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=747&q=80",
-    "past_shows": [{
-      "artist_id": 5,
-      "artist_name": "Matt Quevedo",
-      "artist_image_link": "https://images.unsplash.com/photo-1495223153807-b916f75de8c5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80",
-      "start_time": "2019-06-15T23:00:00.000Z"
-    }],
-    "upcoming_shows": [{
-      "artist_id": 6,
-      "artist_name": "The Wild Sax Band",
-      "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
-      "start_time": "2035-04-01T20:00:00.000Z"
-    }, {
-      "artist_id": 6,
-      "artist_name": "The Wild Sax Band",
-      "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
-      "start_time": "2035-04-08T20:00:00.000Z"
-    }, {
-      "artist_id": 6,
-      "artist_name": "The Wild Sax Band",
-      "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
-      "start_time": "2035-04-15T20:00:00.000Z"
-    }],
-    "past_shows_count": 1,
-    "upcoming_shows_count": 1,
-  }
-  data = list(filter(lambda d: d['id'] == venue_id, [data1, data2, data3]))[0]
   return render_template('pages/show_venue.html', venue=data)
 
 #  Create Venue
@@ -293,17 +244,8 @@ def delete_venue(venue_id):
 #  ----------------------------------------------------------------
 @app.route('/artists')
 def artists():
-  # TODO: replace with real data returned from querying the database
-  data=[{
-    "id": 4,
-    "name": "Guns N Petals",
-  }, {
-    "id": 5,
-    "name": "Matt Quevedo",
-  }, {
-    "id": 6,
-    "name": "The Wild Sax Band",
-  }]
+  # DONE: replace with real data returned from querying the database
+  data = [{"id": a.id, "name": a.name} for a in Artist.query.all()]
   return render_template('pages/artists.html', artists=data)
 
 @app.route('/artists/search', methods=['POST'])
@@ -482,6 +424,8 @@ def create_artist_submission():
 def shows():
   # displays list of shows at /shows
   # TODO: replace with real venues data.
+  #data = [{"venue_id": s.venue_id, "artist_id": s.artist_id, "start_time", s.start_time} for s in Show.query.join().join()]
+  print(data, flush=True)
   data=[{
     "venue_id": 1,
     "venue_name": "The Musical Hop",
