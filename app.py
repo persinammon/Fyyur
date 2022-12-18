@@ -13,8 +13,7 @@ import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
-from flask_migrate import Migrate
-
+#from flask_migrate import Migrate
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -23,12 +22,13 @@ from flask_migrate import Migrate
 app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+
+#migrate = Migrate(app, db)
 context = app.app_context()
 
 # COMPLETED: Add local database URI to config file
 
+db = SQLAlchemy(app)
 
 #----------------------------------------------------------------------------#
 # Models.
@@ -76,11 +76,11 @@ class Artist(db.Model):
 class Show(db.Model):
     __tablename__ = 'Show'
 
-    #may need to make id into tuple (artist_id, venue_id, start_time)
     id = db.Column(db.Integer, primary_key=True)
     artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
     venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
     start_time = db.Column(db.DateTime, nullable=False)
+
 
 
 #instantiate all models in local database
@@ -275,8 +275,13 @@ def search_artists():
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
   # search for "band" should return "The Wild Sax Band".
+#   search_term = request.form.get['search_term']
+#   search = "%{}%".format(search_term)
+#   artists = Artist.query.filter(Artist.name.like(search)).all()
+#   data = [{"id": , "name": , "num_"} for a in artists]
+#   print(artists, flush=True)
   response={
-    "count": 1,
+    "count": len(artists),
     "data": [{
       "id": 4,
       "name": "Guns N Petals",
