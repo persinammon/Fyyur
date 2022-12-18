@@ -1,52 +1,49 @@
-Fyyur
------
+## Fyyur
 
-## Introduction
+Fyyur is a Flask web application project for viewing venues, musicians, and shows by musicians at venues. 
 
-Fyyur is a web application project for viewing venues, musicians, and shows by musicians at venues. 
-Front-end templating of views and a backend structure were given. I set up a local Postgres database, 
-wrote the data models, and implemented backend server logic to CRUD musician, show, and venue data 
-from the database. I also performed a database migration after updating model columns.
+Front-end templating of views and a backend structure were given. 
 
-## Tech Stack (Dependencies)
+I did the following:
+- Set up a local PostgreSQL database
+- Wrote the data models using SQLAlchemy
+- Populated the database with mock data
+- Implemented backend server logic for CRUD functions on musician, show, and venue data using SQLAlchemy
+- Used Flask-Migrate to perform a database migration after updating database table schema
 
-### 1. Backend Dependencies
-The tech stack includes the following:
- * **virtualenv** as a tool to create isolated Python environments
- * **SQLAlchemy ORM** to be our ORM library of choice
- * **PostgreSQL** as our database of choice
- * **Python3** and **Flask** as our server language and server framework
- * **Flask-Migrate** for creating and running schema migrations
+### Backend Dependencies
 
-### 2. Frontend Dependencies
-There must be **HTML**, **CSS**, and **Javascript** with [Bootstrap 3](https://getbootstrap.com/docs/3.4/customize/) for the website's frontend. 
+ - virtualenv
+ - SQLAlchemy ORM
+ - PostgreSQL
+ - Python 3.6 and Flask 
+ - Flask-Migrate 
 
-## Development Setup
+## Local Deployment Setup
 
-1. **Fork or clone Git repo for local running**
-
-3. **Initialize and activate a virtualenv using:**
+1. **Initialize and activate a virtualenv using:**
 ```
 python -m virtualenv env
-source env/bin/activate
-```
->**Note** - In Windows, the `env` does not have a `bin` directory. Therefore, you'd use the analogous command shown below:
-```
-source env/Scripts/activate
 ```
 
-4. **Install the dependencies:**
+To activate the virtual environment, use `source env/bin/activate` in Linux or
+MacOS and `source env/Scripts/activate` in Windows.
+
+2. **Install the dependencies:**
 ```
 pip install -r requirements.txt
 ```
 
-5. **Run the development server:**
+3. **Run the development server:**
+
+Use `python3` or `python` depending on which points to version 3.6.
 ```
-export FLASK_APP=myapp
+export FLASK_APP=app.py
 export FLASK_ENV=development # enables debug mode
-python3 app.py
+python app.py 
 ```
+Replace `export` with `set` in Windows terminal (Powershell or Command Prompt).
 
 6. **Verify on the Browser**<br>
-Navigate to project homepage [http://127.0.0.1:5000/](http://127.0.0.1:5000/) or [http://localhost:5000](http://localhost:5000) 
+Navigate to [http://127.0.0.1:5000/](http://127.0.0.1:5000/) or [http://localhost:5000](http://localhost:5000) 
 
