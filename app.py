@@ -26,8 +26,6 @@ app.config.from_object('config')
 #migrate = Migrate(app, db)
 context = app.app_context()
 
-# COMPLETED: Add local database URI to config file
-
 db = SQLAlchemy(app)
 
 #----------------------------------------------------------------------------#
