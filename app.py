@@ -1,7 +1,7 @@
 #----------------------------------------------------------------------------#
 # Imports
 #----------------------------------------------------------------------------#
-
+import os
 import json, datetime
 from collections import defaultdict
 import dateutil.parser
@@ -23,10 +23,26 @@ app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
 
+try:
+    DATABASE = {
+        'HOST': os.environ['DB_HOST'],
+        'PORT': os.environ['DB_PORT'],
+        'NAME': os.environ['DB_NAME'],
+        'USER': os.environ['DB_USER'],
+        'PASSWORD': os.environ['DB_PASSWORD'],
+    }
+    SQLALCHEMY_DATABASE_URI = "postgresql://" + DATABASE['USER'] + ":" + DATABASE['PASSWORD'] + "@" + DATABASE['HOST'] + ":" + DATABASE['PORT'] + "/" + DATABASE['NAME']
+    app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+    print(SQLALCHEMY_DATABASE_URI, file=sys.stderr)
+except KeyError:
+  pass
+
+print(SQLALCHEMY_DATABASE_URI)
 #migrate = Migrate(app, db)
 context = app.app_context()
-
 db = SQLAlchemy(app)
+
+
 
 #----------------------------------------------------------------------------#
 # Models.
@@ -503,12 +519,10 @@ if not app.debug:
 #----------------------------------------------------------------------------#
 
 # Default port:
-if __name__ == '__main__':
-    app.run()
+# if __name__ == '__main__':
+#     app.run()
 
 # Or specify port manually:
-'''
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
-'''
+    app.run(host='0.0.0.0', port=8000)
+

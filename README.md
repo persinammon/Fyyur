@@ -19,9 +19,35 @@ I did the following:
  - Python 3.6 and Flask 
  - Flask-Migrate 
 
-## Local Deployment Setup
+### Deployment Setup
 
-1. **Initialize and activate a virtualenv using:**
+
+
+Note: This needs to be cleaned up for production.
+
+### Local Development Setup
+
+1. Set up Python3 to point to Python 3.6.
+
+2. Create a `config.py` in root directory with the following contents:
+
+```
+import os
+SECRET_KEY = os.urandom(32)
+# Grabs the folder where the script runs.
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+# Enable debug mode.
+DEBUG = True
+
+# LOCAL DATABASE URI
+SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:{POSTGRES_USER_PASSWORD}@localhost:5432/fyyur'
+```
+
+2. Run `createdb fyyur`.
+
+2. Create a virtualenv using:
+
 ```
 python -m virtualenv env
 ```
@@ -29,21 +55,23 @@ python -m virtualenv env
 To activate the virtual environment, use `source env/bin/activate` in Linux or
 MacOS and `source env/Scripts/activate` in Windows.
 
-2. **Install the dependencies:**
+3.Install dependencies:
+
 ```
 pip install -r requirements.txt
 ```
 
-3. **Run the development server:**
+4. Run the development server:
 
-Use `python3` or `python` depending on which points to version 3.6.
 ```
 export FLASK_APP=app.py
 export FLASK_ENV=development # enables debug mode
-python app.py 
+python3 app.py 
 ```
-Replace `export` with `set` in Windows terminal (Powershell or Command Prompt).
+Replace `export` with `set` in Windows terminal.
 
-6. **Verify on the Browser**<br>
+6. Verify on the Browser
+
 Navigate to [http://127.0.0.1:5000/](http://127.0.0.1:5000/) or [http://localhost:5000](http://localhost:5000) 
 
+7. Use `Ctrl+C` to interrupt running and `deactivate` to exit virtual environment.
