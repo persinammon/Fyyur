@@ -27,9 +27,22 @@ Note: This needs to be cleaned up for production.
 
 ### Local Development Setup
 
-1. Set up Python3 to point to Python 3.6.
+1. Create a virtualenv using:
 
-2. Create a `config.py` in root directory with the following contents:
+```
+python3 -m venv env
+```
+
+To activate the virtual environment, use `source env/bin/activate` in Linux or
+MacOS and `source env/Scripts/activate` in Windows.
+
+2. Activate virtual environment and install dependencies:
+
+```
+pip3 install -r requirements.txt
+```
+
+3. Create a `config.py` in root directory with the following contents:
 
 ```
 import os
@@ -44,24 +57,9 @@ DEBUG = True
 SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:{POSTGRES_USER_PASSWORD}@localhost:5432/fyyur'
 ```
 
-2. Run `createdb fyyur`.
+4. Run `createdb fyyur`.
 
-2. Create a virtualenv using:
-
-```
-python -m virtualenv env
-```
-
-To activate the virtual environment, use `source env/bin/activate` in Linux or
-MacOS and `source env/Scripts/activate` in Windows.
-
-3.Install dependencies:
-
-```
-pip install -r requirements.txt
-```
-
-4. Run the development server:
+5. Run the development server:
 
 ```
 export FLASK_APP=app.py
