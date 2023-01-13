@@ -3,3 +3,4 @@ config.py
 __pycache__
 migrations/__pycache__
 migration/.idea
+env

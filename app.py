@@ -1,7 +1,7 @@
 #----------------------------------------------------------------------------#
 # Imports
 #----------------------------------------------------------------------------#
-
+import os
 import json, datetime
 from collections import defaultdict
 import dateutil.parser
@@ -13,7 +13,8 @@ import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
-#from flask_migrate import Migrate
+from flask_migrate import Migrate
+import psycopg2
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -81,9 +82,10 @@ class Show(db.Model):
 
 
 
+
 #instantiate all models in local database
 with context:
-  db.drop_all() #when testing use this
+  #db.drop_all() #when testing use this
   db.create_all()
   #instantiate mock data through models
   #use mock data to test before database migration
@@ -502,13 +504,13 @@ if not app.debug:
 # Launch.
 #----------------------------------------------------------------------------#
 
-# Default port:
-if __name__ == '__main__':
-    app.run()
-
+# # Default port:
+# if __name__ == '__main__':
+#     app.run()
+def create_app():
+  return app
 # Or specify port manually:
-'''
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
-'''
+    app.run(port=8000)
+
+

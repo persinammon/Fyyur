@@ -10,40 +10,75 @@ I did the following:
 - Populated the database with mock data
 - Implemented backend server logic for CRUD functions on musician, show, and venue data using SQLAlchemy
 - Used Flask-Migrate to perform a database migration after updating database table schema
+- Set up a factory method for production server Waitress
 
 ### Backend Dependencies
 
- - virtualenv
+ - virtualenv (for local development)
  - SQLAlchemy ORM
  - PostgreSQL
- - Python 3.6 and Flask 
+ - Python3
+ - Flask 
  - Flask-Migrate 
+ - Waitress
 
-## Local Deployment Setup
+### Deployment Setup
 
-1. **Initialize and activate a virtualenv using:**
+Run the following command:
+
 ```
-python -m virtualenv env
+waitress-serve --port=8000 --call app:create_app
+```
+
+There are separate Dockerfiles for a PostgreSQL database and a Flask web app container,
+but there is a persistent error where `psycopg2` cannot connect to the database 
+(suspected issue with authorization).
+
+### Local Development Setup
+
+1. Create a virtualenv using:
+
+```
+python3 -m venv env
 ```
 
 To activate the virtual environment, use `source env/bin/activate` in Linux or
 MacOS and `source env/Scripts/activate` in Windows.
 
-2. **Install the dependencies:**
+2. Activate virtual environment and install dependencies:
+
 ```
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
-3. **Run the development server:**
+3. Create a `config.py` in root directory with the following contents:
 
-Use `python3` or `python` depending on which points to version 3.6.
+```
+import os
+SECRET_KEY = os.urandom(32)
+# Grabs the folder where the script runs.
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+# Enable debug mode.
+DEBUG = True
+
+# LOCAL DATABASE URI
+SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:{POSTGRES_USER_PASSWORD}@localhost:5432/fyyur'
+```
+
+4. Run `createdb fyyur`.
+
+5. Run the development server:
+
 ```
 export FLASK_APP=app.py
 export FLASK_ENV=development # enables debug mode
-python app.py 
+flask run
 ```
-Replace `export` with `set` in Windows terminal (Powershell or Command Prompt).
+Replace `export` with `set` in Windows terminal.
 
-6. **Verify on the Browser**<br>
+6. Verify on the Browser
+
 Navigate to [http://127.0.0.1:5000/](http://127.0.0.1:5000/) or [http://localhost:5000](http://localhost:5000) 
 
+7. Use `Ctrl+C` to interrupt running and `deactivate` to exit virtual environment.
