@@ -23,5 +23,6 @@ COPY templates templates
 ENV POSTGRES_PORT=5432
 ENV POSTGRES_DB=fyyur
 ENV POSTGRES_PASSWORD=artists
+ENV POSTGRES_HOST_AUTH_METHOD=scram-sha-256
 
 ENTRYPOINT [ "waitress-serve", "--port", "8000", "--call", "app:create_app" ]

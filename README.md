@@ -10,20 +10,29 @@ I did the following:
 - Populated the database with mock data
 - Implemented backend server logic for CRUD functions on musician, show, and venue data using SQLAlchemy
 - Used Flask-Migrate to perform a database migration after updating database table schema
+- Set up a factory method for production server Waitress
 
 ### Backend Dependencies
 
- - virtualenv
+ - virtualenv (for local development)
  - SQLAlchemy ORM
  - PostgreSQL
- - Python 3.6 and Flask 
+ - Python3
+ - Flask 
  - Flask-Migrate 
+ - Waitress
 
 ### Deployment Setup
 
+Run the following command:
 
+```
+waitress-serve --port=8000 --call app:create_app
+```
 
-Note: This needs to be cleaned up for production.
+There are separate Dockerfiles for a PostgreSQL database and a Flask web app container,
+but there is a persistent error where `psycopg2` cannot connect to the database 
+(suspected issue with authorization).
 
 ### Local Development Setup
 
@@ -64,7 +73,7 @@ SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:{POSTGRES_USER_PASSWORD}@localh
 ```
 export FLASK_APP=app.py
 export FLASK_ENV=development # enables debug mode
-python3 app.py 
+flask run
 ```
 Replace `export` with `set` in Windows terminal.
 
