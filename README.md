@@ -32,7 +32,9 @@ waitress-serve --port=8000 --call app:create_app
 
 There are separate Dockerfiles for a PostgreSQL database and a Flask web app container,
 but there is a persistent error where `psycopg2` cannot connect to the database 
-(suspected issue with authorization).
+(suspected issue with authorization in Postgres database). I think I'll eventually
+move from SQLAlchemy to another ORM (Peewee) to test if that allows for database
+access in containers.
 
 ### Local Development Setup
 
